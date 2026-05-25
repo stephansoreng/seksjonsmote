@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[TITTEL PÅ MØTE] – [DATO]</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/white.min.css" id="theme">
+
+    <style>
+        :root {
+            --hn-dark-blue: #003087;
+            --hn-light-blue: #6cace4;
+            --header-height: 80px;
+        }
+
+        .reveal { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .reveal .slides { text-align: left; }
+
+        .reveal h1, .reveal h2, .reveal h3 {
+            color: var(--hn-dark-blue);
+            text-transform: none;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Aksent-linje under h2 */
+        .reveal h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--hn-light-blue);
+            margin-top: 8px;
+            border-radius: 2px;
+        }
+
+        /* Persistent header */
+        #header {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background: linear-gradient(135deg, #ffffff 60%, #e8f1fb);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            box-sizing: border-box;
+            border-bottom: 2px solid var(--hn-light-blue);
+            box-shadow: 0 2px 12px rgba(0, 48, 135, 0.1);
+        }
+        #header img { height: 50px; }
+
+        /* ── Layout: 2-kolonne (tekst + bilde) ── */
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            height: 100%;
+        }
+        .col-text { flex: 1; }
+        .col-media {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+        .col-media img {
+            max-width: 100%;
+            max-height: 550px;
+            width: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            object-fit: contain;
+            background: white;
+            padding: 10px;
+        }
+
+        /* ── Layout: To bilder + tekstboks (image-pair) ── */
+        .epj-grid { display: flex; flex-direction: column; gap: 20px; width: 100%; }
+        .epj-media { display: flex; justify-content: center; gap: 30px; width: 100%; }
+        .epj-media img {
+            max-height: 500px;
+            max-width: 48%;
+            width: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: white;
+            padding: 10px;
+        }
+        .epj-text { width: 100%; display: flex; justify-content: center; }
+        .epj-text ul {
+            background: rgba(0, 48, 135, 0.06);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(108, 172, 228, 0.35);
+            padding: 20px 40px !important;
+            border-radius: 8px;
+            border-left: 5px solid var(--hn-dark-blue);
+            list-style: none;
+            margin: 0 !important;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* ── Layout: 3-kolonne grid (admin) ── */
+        .admin-grid { display: flex; flex-direction: column; gap: 15px; height: 100%; }
+        .admin-media { display: flex; justify-content: center; gap: 20px; width: 100%; }
+        .admin-media img {
+            max-height: 420px; max-width: 45%; width: auto;
+            border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: white; padding: 8px;
+        }
+        .admin-text { display: flex; justify-content: center; width: 100%; }
+        .admin-text ul {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            list-style: none;
+            margin: 0 !important;
+            width: 100%;
+            padding: 0 !important;
+        }
+        .admin-text > ul > li {
+            background: rgba(0, 48, 135, 0.06);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(108, 172, 228, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--hn-dark-blue);
+        }
+        .admin-text ul ul {
+            display: block; background: none; padding: 0; border: none;
+            margin-top: 8px !important;
+        }
+        .admin-text li { font-size: 0.75em !important; margin-top: 20px !important; }
+
+        /* Typografi */
+        .reveal p, .reveal li {
+            font-size: 0.8em;
+            line-height: 1.25;
+            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .reveal h2 { margin-bottom: 10px; font-size: 1.4em; }
+        .reveal ul { margin-left: 1.2em; }
+        .reveal li::marker { color: var(--hn-light-blue); font-size: 1.2em; }
+        .highlight { color: var(--hn-dark-blue); font-weight: 600; }
+
+        /* Slide spacing */
+        .reveal .slides section { padding-top: var(--header-height); }
+
+        /* ── TYPE: hero-slide (åpning/avslutning) ── */
+        .welcome-slide { text-align: center !important; }
+        .welcome-slide h2 {
+            color: white !important;
+            border-bottom: 4px solid var(--hn-light-blue);
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+        }
+
+        section[data-background-color="#003087"] {
+            background-color: #003087;
+        }
+        .welcome-slide h2::after { display: none; }
+        .welcome-slide p { color: rgba(255, 255, 255, 0.85) !important; }
+        .welcome-slide img {
+            max-height: 580px; max-width: 100%; width: auto;
+            object-fit: contain; border-radius: 10px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        /* ── TYPE: light-bg-slide (lys bakgrunn) ── */
+        .light-slide { background: #f4f8fd !important; border-radius: 12px; }
+
+        /* Pulserende avslutningstegn */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.08); opacity: 0.85; }
+        }
+        .question-mark {
+            animation: pulse 2.2s ease-in-out infinite;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            background: var(--hn-light-blue);
+            color: white;
+            font-size: 2.8em; font-weight: 700;
+            margin-top: 40px;
+            box-shadow: 0 6px 24px rgba(108, 172, 228, 0.45);
+        }
+
+        /* Animasjoner */
+        @keyframes slideInLeft {
+            from { transform: translateX(-40px); opacity: 0; }
+            to   { transform: translateX(0);     opacity: 1; }
+        }
+        .reveal .present h2 {
+            animation: slideInLeft 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        @keyframes imgEntrance {
+            from { transform: scale(0.96); opacity: 0.5; }
+            to   { transform: scale(1);    opacity: 1;   }
+        }
+        .reveal .present .col-media img,
+        .reveal .present .epj-media img {
+            animation: imgEntrance 0.55s ease-out both;
+            animation-delay: 0.1s;
+        }
+
+        /* Progress bar og slide-nummer */
+        .reveal .progress { color: var(--hn-light-blue); height: 4px; }
+        .reveal .slide-number {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.75em; color: #aaa; background: transparent;
+            left: 8px; right: auto; bottom: 8px;
+        }
+
+        /* Navigasjonspiler */
+        .reveal .controls { color: var(--hn-dark-blue); transform: scale(1.35); transform-origin: bottom right; }
+        .reveal.has-dark-background .controls { color: white; }
+        .reveal .controls button { opacity: 0.65; transition: opacity 0.15s; }
+        .reveal .controls button:hover { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <!-- Bytt ut src med sti til logo -->
+        <img src="docs/logo-helse-nord-ikt.svg" alt="Helse Nord IKT Logo">
+    </div>
+
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- ════════════════════════════════════════════
+                 TYPE: hero-slide  (åpningsslide)
+                 Mørk blå bakgrunn, sentrert tekst + bilde
+                 Bruk: data-background-color="#003087"
+                 ════════════════════════════════════════════ -->
+            <section class="welcome-slide" data-background-color="#003087">
+                <h2>Velkommen til [MØTENAVN]!</h2>
+                <!-- Valgfritt: legg til et bilde her -->
+                <!-- <img src="docs/bilde.png" alt="Illustrasjon"> -->
+            </section>
+
+
+            <!-- ════════════════════════════════════════════
+                 TYPE: text+image
+                 Venstre: punktliste  |  Høyre: bilde
+                 Tips: juster flex på col-text/col-media
+                       med inline style="flex: 0.6;" etc.
+                 ════════════════════════════════════════════ -->
+            <section>
+                <h2>[SLIDETITTEL]</h2>
+                <div class="container">
+                    <div class="col-text">
+                        <ul>
+                            <li class="fragment fade-up">[Punkt 1]</li>
+                            <li class="fragment fade-up">[Punkt 2]
+                                <ul>
+                                    <li class="fragment fade-up">[Underpunkt]</li>
+                                </ul>
+                            </li>
+                            <li class="fragment fade-up">[Punkt 3]</li>
+                        </ul>
+                    </div>
+                    <div class="col-media">
+                        <img src="docs/[bilde].png" alt="[Bildebeskrivelse]">
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ════════════════════════════════════════════
+                 TYPE: text-only
+                 Kun punktliste, ingen bilde
+                 Tips: legg til class="light-slide" på section
+                       for lys blå bakgrunn
+                 ════════════════════════════════════════════ -->
+            <section>
+                <h2>[SLIDETITTEL]</h2>
+                <p>[Valgfri introduksjonstekst]</p>
+                <ul>
+                    <li class="fragment fade-up">[Punkt 1]</li>
+                    <li class="fragment fade-up">[Punkt 2]</li>
+                    <li class="fragment fade-up"><span class="highlight">[Uthevet tekst]</span> [resten av punktet]</li>
+                    <li class="fragment fade-up">[Punkt 4]</li>
+                </ul>
+            </section>
+
+
+            <!-- ════════════════════════════════════════════
+                 TYPE: image-pair
+                 To bilder side om side + tekstboks under
+                 ════════════════════════════════════════════ -->
+            <section>
+                <h2>[SLIDETITTEL]</h2>
+                <div class="epj-grid">
+                    <div class="epj-media">
+                        <img src="docs/[bilde1].png" alt="[Bilde 1]">
+                        <img src="docs/[bilde2].png" alt="[Bilde 2]">
+                    </div>
+                    <div class="epj-text">
+                        <ul>
+                            <li class="fragment fade-up">[Nøkkelpunkt 1]</li>
+                            <li class="fragment fade-up">[Nøkkelpunkt 2]</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ════════════════════════════════════════════
+                 TYPE: hero-slide  (avslutningsslide)
+                 Speil av åpningssliden — skaper bookend-effekt
+                 ════════════════════════════════════════════ -->
+            <section class="welcome-slide" data-background-color="#003087">
+                <h2>Eventuelt</h2>
+                <p>Er det noen som har noe på hjertet?</p>
+                <div class="question-mark">?</div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Reveal.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.js"></script>
+    <script>
+        Reveal.initialize({
+            transition: 'fade',
+            center: true,
+            hash: true,
+            margin: 0.05,
+            width: 1400,
+            height: 900,
+            minScale: 0.2,
+            maxScale: 2.0,
+            progress: true,
+            slideNumber: 'c/t',
+            plugins: []
+        });
+    </script>
+</body>
+</html>
