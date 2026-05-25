@@ -529,17 +529,27 @@
         return { w, h, dx: (maxW - w) / 2, dy: (maxH - h) / 2 };
     }
 
-    function getBullets(section) {
+    function getBullets(container) {
         const items = [];
-        section.querySelectorAll('ul > li').forEach(li => {
-            const directText = Array.from(li.childNodes)
-                .filter(n => n.nodeType === Node.TEXT_NODE || (n.nodeType === Node.ELEMENT_NODE && n.tagName !== 'UL'))
-                .map(n => n.textContent.trim()).join(' ').trim();
-            if (directText) items.push({ text: directText, options: { bullet: true, fontSize: 16, color: '333333' } });
-            li.querySelectorAll('ul > li').forEach(sub => {
-                const t = sub.textContent.trim();
-                if (t) items.push({ text: '    ' + t, options: { bullet: true, fontSize: 14, color: '555555' } });
+        function processUl(ul, depth) {
+            ul.querySelectorAll(':scope > li').forEach(li => {
+                const directText = Array.from(li.childNodes)
+                    .filter(n => n.nodeType === Node.TEXT_NODE || (n.nodeType === Node.ELEMENT_NODE && n.tagName !== 'UL'))
+                    .map(n => n.textContent.trim()).join(' ').trim();
+                if (directText) {
+                    items.push({ text: '    '.repeat(depth) + directText,
+                        options: { bullet: true, fontSize: depth === 0 ? 16 : 14, color: depth === 0 ? '333333' : '555555' } });
+                }
+                li.querySelectorAll(':scope > ul').forEach(nested => processUl(nested, depth + 1));
             });
+        }
+        Array.from(container.children).forEach(child => {
+            if (child.tagName === 'P') {
+                const t = child.textContent.trim();
+                if (t) items.push({ text: t, options: { bold: true, fontSize: 15, color: '003087', bullet: false } });
+            } else if (child.tagName === 'UL') {
+                processUl(child, 0);
+            }
         });
         return items;
     }
