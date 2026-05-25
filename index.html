@@ -363,12 +363,33 @@
         .reveal .controls button:hover {
             opacity: 1;
         }
+
+        #export-btn {
+            margin-left: auto;
+            background: var(--hn-dark-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.8em;
+            cursor: pointer;
+            opacity: 0.85;
+            transition: opacity 0.15s;
+            white-space: nowrap;
+        }
+        #export-btn:hover { opacity: 1; }
+        #export-btn:disabled { opacity: 0.5; cursor: wait; }
+        @media print { #export-btn { display: none; } }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 </head>
 <body>
 
     <div id="header">
         <img src="docs/logo-helse-nord-ikt.svg" alt="Helse Nord IKT Logo">
+        <button id="export-btn" onclick="exportToPptx()">⬇ PPTX</button>
     </div>
 
     <div class="reveal">
@@ -484,6 +505,141 @@
 
     <!-- Reveal.js JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.js"></script>
+
+    <script>
+    async function imgToBase64(src) {
+        try {
+            const res = await fetch(src);
+            const blob = await res.blob();
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function getBullets(section) {
+        const items = [];
+        section.querySelectorAll('ul > li').forEach(li => {
+            const directText = Array.from(li.childNodes)
+                .filter(n => n.nodeType === Node.TEXT_NODE || (n.nodeType === Node.ELEMENT_NODE && n.tagName !== 'UL'))
+                .map(n => n.textContent.trim()).join(' ').trim();
+            if (directText) items.push({ text: directText, options: { bullet: true, fontSize: 16, color: '333333' } });
+            li.querySelectorAll('ul > li').forEach(sub => {
+                const t = sub.textContent.trim();
+                if (t) items.push({ text: '    ' + t, options: { bullet: true, fontSize: 14, color: '555555' } });
+            });
+        });
+        return items;
+    }
+
+    async function exportToPptx() {
+        const btn = document.getElementById('export-btn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Lager fil…';
+
+        const DARK_BLUE = '003087';
+        const LIGHT_BLUE = '6cace4';
+        const W = 10, H = 5.63;
+
+        const pptx = new PptxGenJS();
+        pptx.layout = 'LAYOUT_WIDE';
+        pptx.defineLayout({ name: 'WIDE169', width: W, height: H });
+        pptx.layout = 'WIDE169';
+
+        const sections = document.querySelectorAll('.reveal .slides > section');
+
+        for (const section of sections) {
+            const slide = pptx.addSlide();
+            const titleEl = section.querySelector('h2');
+            const titleText = titleEl ? titleEl.textContent.trim() : '';
+            const isHero = section.classList.contains('welcome-slide');
+            const isImagePair = !!section.querySelector('.epj-grid');
+            const isTextImage = !!section.querySelector('.container');
+
+            if (isHero) {
+                slide.background = { color: DARK_BLUE };
+                if (titleText) {
+                    slide.addText(titleText, {
+                        x: 0.5, y: 1.8, w: W - 1, h: 1.2,
+                        fontSize: 32, bold: true, color: 'FFFFFF',
+                        align: 'center', fontFace: 'Calibri'
+                    });
+                }
+                const imgEl = section.querySelector('img');
+                if (imgEl) {
+                    const b64 = await imgToBase64(imgEl.src);
+                    if (b64) slide.addImage({ data: b64, x: 2.5, y: 2.8, w: 5, h: 2.5, sizing: { type: 'contain', w: 5, h: 2.5 } });
+                }
+                const pEl = section.querySelector('p');
+                if (pEl) {
+                    slide.addText(pEl.textContent.trim(), {
+                        x: 0.5, y: 3.0, w: W - 1, h: 0.6,
+                        fontSize: 18, color: 'CCDDEE', align: 'center', fontFace: 'Calibri'
+                    });
+                }
+
+            } else if (isImagePair) {
+                slide.background = { color: 'FFFFFF' };
+                if (titleText) {
+                    slide.addText(titleText, { x: 0.4, y: 0.15, w: W - 0.8, h: 0.5, fontSize: 24, bold: true, color: DARK_BLUE, fontFace: 'Calibri' });
+                    slide.addShape(pptx.ShapeType.rect, { x: 0.4, y: 0.68, w: 0.6, h: 0.04, fill: { color: LIGHT_BLUE }, line: { color: LIGHT_BLUE } });
+                }
+                const imgs = section.querySelectorAll('.epj-media img');
+                const positions = [{ x: 0.4, w: 4.3 }, { x: 5.0, w: 4.6 }];
+                for (let i = 0; i < Math.min(imgs.length, 2); i++) {
+                    const b64 = await imgToBase64(imgs[i].src);
+                    if (b64) slide.addImage({ data: b64, x: positions[i].x, y: 0.8, w: positions[i].w, h: 3.2, sizing: { type: 'contain', w: positions[i].w, h: 3.2 } });
+                }
+                const bullets = getBullets(section.querySelector('.epj-text') || section);
+                if (bullets.length) slide.addText(bullets, { x: 0.4, y: 4.1, w: W - 0.8, h: 1.3, fontFace: 'Calibri' });
+
+            } else if (isTextImage) {
+                slide.background = { color: 'FFFFFF' };
+                if (titleText) {
+                    slide.addText(titleText, { x: 0.4, y: 0.15, w: W - 0.8, h: 0.5, fontSize: 24, bold: true, color: DARK_BLUE, fontFace: 'Calibri' });
+                    slide.addShape(pptx.ShapeType.rect, { x: 0.4, y: 0.68, w: 0.6, h: 0.04, fill: { color: LIGHT_BLUE }, line: { color: LIGHT_BLUE } });
+                }
+                const textCol = section.querySelector('.col-text');
+                const imgEl = section.querySelector('.col-media img');
+                if (textCol) {
+                    const bullets = getBullets(textCol);
+                    if (bullets.length) slide.addText(bullets, { x: 0.4, y: 0.9, w: 4.4, h: H - 1.0, fontFace: 'Calibri', valign: 'top' });
+                }
+                if (imgEl) {
+                    const b64 = await imgToBase64(imgEl.src);
+                    if (b64) slide.addImage({ data: b64, x: 5.1, y: 0.8, w: 4.5, h: H - 1.0, sizing: { type: 'contain', w: 4.5, h: H - 1.0 } });
+                }
+
+            } else {
+                const isLight = section.classList.contains('omradestyret-slide');
+                slide.background = { color: isLight ? 'F4F8FD' : 'FFFFFF' };
+                if (titleText) {
+                    slide.addText(titleText, { x: 0.4, y: 0.15, w: W - 0.8, h: 0.5, fontSize: 24, bold: true, color: DARK_BLUE, fontFace: 'Calibri' });
+                    slide.addShape(pptx.ShapeType.rect, { x: 0.4, y: 0.68, w: 0.6, h: 0.04, fill: { color: LIGHT_BLUE }, line: { color: LIGHT_BLUE } });
+                }
+                const pEl = section.querySelector('p');
+                let yStart = 0.9;
+                if (pEl) {
+                    slide.addText(pEl.textContent.trim(), { x: 0.4, y: yStart, w: W - 0.8, h: 0.4, fontSize: 15, color: '333333', fontFace: 'Calibri', italic: true });
+                    yStart = 1.35;
+                }
+                const bullets = getBullets(section);
+                if (bullets.length) slide.addText(bullets, { x: 0.4, y: yStart, w: W - 0.8, h: H - yStart - 0.1, fontFace: 'Calibri', valign: 'top' });
+            }
+        }
+
+        const title = document.title.replace(/[^a-zA-Z0-9æøåÆØÅ\s-]/g, '').trim() || 'presentasjon';
+        await pptx.writeFile({ fileName: title + '.pptx' });
+
+        btn.disabled = false;
+        btn.textContent = '⬇ PPTX';
+    }
+    </script>
     <script>
         Reveal.initialize({
             transition: 'fade',
