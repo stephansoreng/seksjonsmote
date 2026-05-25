@@ -541,9 +541,9 @@
                     items.push({ text: directText, options: {
                         bullet: true,
                         indentLevel: depth,
-                        fontSize: depth === 0 ? 16 : 14,
-                        color: depth === 0 ? '333333' : '555555',
-                        paraSpaceAfter: depth === 0 ? 4 : 2
+                        fontSize: depth === 0 ? 16 : 13,
+                        color: depth === 0 ? '333333' : '666666',
+                        paraSpaceAfter: depth === 0 ? 4 : 1
                     }});
                 }
                 li.querySelectorAll(':scope > ul').forEach(nested => processUl(nested, depth + 1));
@@ -553,10 +553,10 @@
             if (child.tagName === 'P') {
                 const t = child.textContent.trim();
                 if (t) items.push({ text: t, options: {
+                    bullet: { character: '›' },
                     bold: true,
                     fontSize: 15,
                     color: '003087',
-                    bullet: false,
                     paraSpaceBefore: items.length === 0 ? 0 : 10,
                     paraSpaceAfter: 4
                 }});
@@ -665,14 +665,8 @@
                     slide.addText(titleText, { x: 0.4, y: 0.15, w: W - 0.8, h: 0.5, fontSize: 24, bold: true, color: DARK_BLUE, fontFace: 'Calibri' });
                     slide.addShape(pptx.ShapeType.rect, { x: 0.4, y: 0.68, w: 0.6, h: 0.04, fill: { color: LIGHT_BLUE }, line: { color: LIGHT_BLUE } });
                 }
-                const pEl = section.querySelector('p');
-                let yStart = 0.9;
-                if (pEl) {
-                    slide.addText(pEl.textContent.trim(), { x: 0.4, y: yStart, w: W - 0.8, h: 0.4, fontSize: 15, color: '333333', fontFace: 'Calibri', italic: true });
-                    yStart = 1.35;
-                }
                 const bullets = getBullets(section);
-                if (bullets.length) slide.addText(bullets, { x: 0.4, y: yStart, w: W - 0.8, h: H - yStart - 0.1, fontFace: 'Calibri', valign: 'top' });
+                if (bullets.length) slide.addText(bullets, { x: 0.4, y: 0.9, w: W - 0.8, h: H - 1.0, fontFace: 'Calibri', valign: 'top' });
             }
         }
 
